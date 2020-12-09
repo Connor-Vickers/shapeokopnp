@@ -192,10 +192,18 @@ public class SerialPortCommunications extends ReferenceDriverCommunications {
         return portName;
     }
 
+    public String getPortName2() {
+        return portName2;
+    }
+
     public void setPortName(String portName) {
         this.portName = portName;
     }
 
+    public void setPortName2(String portName2) {
+        this.portName2 = portName2;
+    }
+    
     public int getBaud() {
         return baud;
     }
