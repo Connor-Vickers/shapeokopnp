@@ -23,6 +23,7 @@ import java.awt.event.KeyEvent;
 public class AbstractReferenceDriverConfigurationWizard extends AbstractConfigurationWizard implements ActionListener {
     private final AbstractReferenceDriver driver;
     private JComboBox comboBoxPort;
+    private JComboBox comboBoxPort2;
     private JComboBox comboBoxBaud;
     private JComboBox flowControlComboBox;
     private JComboBox stopBitsComboBox;
@@ -122,6 +123,8 @@ public class AbstractReferenceDriverConfigurationWizard extends AbstractConfigur
                         FormSpecs.RELATED_GAP_ROWSPEC,
                         FormSpecs.DEFAULT_ROWSPEC,
                         FormSpecs.RELATED_GAP_ROWSPEC,
+                        FormSpecs.DEFAULT_ROWSPEC,
+                        FormSpecs.RELATED_GAP_ROWSPEC,
                         FormSpecs.DEFAULT_ROWSPEC,}));
 
         JLabel lblPortName = new JLabel("Port");
@@ -192,6 +195,12 @@ public class AbstractReferenceDriverConfigurationWizard extends AbstractConfigur
 
         setRtsCheckbox = new JCheckBox("");
         panelSerial.add(setRtsCheckbox, "4, 16");
+        
+        JLabel lblPortName2 = new JLabel("Port2");
+        panelSerial.add(lblPortName2, "2, 18, right, default");
+        
+        comboBoxPort2 = new JComboBox();
+        panelSerial.add(comboBoxPort2, "4, 18, fill, default");
 
         comboBoxPort.addPopupMenuListener(new PopupMenuListener() {
             @Override
@@ -207,8 +216,24 @@ public class AbstractReferenceDriverConfigurationWizard extends AbstractConfigur
             public void popupMenuCanceled(PopupMenuEvent e) {
             }
         });
+        
+        comboBoxPort2.addPopupMenuListener(new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                refreshPortList2();
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
+        });
 
         refreshPortList();
+        refreshPortList2();
 
         // TCP config code
         panelTcp = new JPanel();
@@ -293,6 +318,24 @@ public class AbstractReferenceDriverConfigurationWizard extends AbstractConfigur
         }
     }
 
+    
+    private void refreshPortList2() {
+        if (driver != null) {
+            comboBoxPort2.removeAllItems();            
+            boolean exists = false;
+            String[] portNames = SerialPortCommunications.getPortNames();
+            for (String portName : portNames) {
+                comboBoxPort2.addItem(portName);
+                if (portName.equals(driver.getPortName())) {
+                    exists = true;
+                }
+            }
+            if (!exists && driver.getPortName() != null) {
+                comboBoxPort2.addItem(driver.getPortName());
+            }
+        }
+    }
+    
     @Override
     public void createBindings() {
         IntegerConverter integerConverter = new IntegerConverter();
