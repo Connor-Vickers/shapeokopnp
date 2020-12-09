@@ -41,6 +41,9 @@ public abstract class AbstractReferenceDriver extends AbstractDriver {
      */
     @Attribute(required = false)
     protected String portName;
+    
+    @Attribute(required = false)
+    protected String portName2;
 
     @Attribute(required = false)
     protected Integer baud = 115200;
@@ -167,9 +170,17 @@ public abstract class AbstractReferenceDriver extends AbstractDriver {
     public String getPortName() {
         return serial.getPortName();
     }
+    
+    public String getPortName2() {
+        return serial.getPortName2();
+    }
 
     public void setPortName(String portName) {
         serial.setPortName(portName);
+    }
+    
+    public void setPortName2(String portName2) {
+        serial.setPortName2(portName2);
     }
 
     public int getBaud() {

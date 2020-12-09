@@ -22,345 +22,303 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 public class AbstractReferenceDriverConfigurationWizard extends AbstractConfigurationWizard implements ActionListener {
-    private final AbstractReferenceDriver driver;
-    private JComboBox comboBoxPort;
-    private JComboBox comboBoxPort2;
-    private JComboBox comboBoxBaud;
-    private JComboBox flowControlComboBox;
-    private JComboBox stopBitsComboBox;
-    private JComboBox dataBitsComboBox;
-    private JComboBox parityComboBox;
-    private JCheckBox setDtrCheckbox;
-    private JCheckBox setRtsCheckbox;
-    private JTextField portTextField;
-    private JTextField ipAddressTextField;
-    private ButtonGroup commsMethodButtonGroup;
-    private JPanel panelSerial;
-    private JPanel panelTcp;
-    private JTextField commsMethod;
-    private JCheckBox connectionKeepAlive;
-    private JPanel panelController;
-    private JLabel lblName;
-    private JTextField driverName;
-  
-    public AbstractReferenceDriverConfigurationWizard(AbstractReferenceDriver driver) {
-        this.driver = driver;
+	private final AbstractReferenceDriver driver;
+	private JComboBox comboBoxPort;
+	private JComboBox comboBoxPort2;
+	private JComboBox comboBoxBaud;
+	private JComboBox flowControlComboBox;
+	private JComboBox stopBitsComboBox;
+	private JComboBox dataBitsComboBox;
+	private JComboBox parityComboBox;
+	private JCheckBox setDtrCheckbox;
+	private JCheckBox setRtsCheckbox;
+	private JTextField portTextField;
+	private JTextField ipAddressTextField;
+	private ButtonGroup commsMethodButtonGroup;
+	private JPanel panelSerial;
+	private JPanel panelTcp;
+	private JTextField commsMethod;
+	private JCheckBox connectionKeepAlive;
 
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        
-        panelController = new JPanel();
-        panelController.setBorder(new TitledBorder(null, "Properties", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        contentPanel.add(panelController);
-        panelController.setLayout(new FormLayout(new ColumnSpec[] {
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,},
-            new RowSpec[] {
-                FormSpecs.RELATED_GAP_ROWSPEC,
-                FormSpecs.DEFAULT_ROWSPEC,}));
-        
-        lblName = new JLabel("Name");
-        panelController.add(lblName, "2, 2, right, default");
-        
-        driverName = new JTextField();
-        panelController.add(driverName, "4, 2, fill, default");
-        driverName.setColumns(20);
+	public AbstractReferenceDriverConfigurationWizard(AbstractReferenceDriver driver) {
+		this.driver = driver;
 
-        //Selector code
-        JPanel panelComms = new JPanel();
-        panelComms.setBorder(new TitledBorder(null, "Communications method", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        contentPanel.add(panelComms);
-        panelComms.setLayout(new FormLayout(new ColumnSpec[] {
-                FormSpecs.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("right:default"),
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,},
-            new RowSpec[] {
-                FormSpecs.RELATED_GAP_ROWSPEC,
-                FormSpecs.DEFAULT_ROWSPEC,
-                FormSpecs.RELATED_GAP_ROWSPEC,
-                FormSpecs.DEFAULT_ROWSPEC,
-                FormSpecs.RELATED_GAP_ROWSPEC,
-                FormSpecs.DEFAULT_ROWSPEC,
-                FormSpecs.RELATED_GAP_ROWSPEC,
-                FormSpecs.DEFAULT_ROWSPEC,}));
+		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
-        JRadioButton radioSerial = new JRadioButton("Serial");
-        radioSerial.setMnemonic(KeyEvent.VK_S);
-        radioSerial.setActionCommand("serial");
-        radioSerial.addActionListener(this);
+		// Selector code
+		JPanel panelComms = new JPanel();
+		panelComms.setBorder(
+				new TitledBorder(null, "Communications method", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		contentPanel.add(panelComms);
+		panelComms.setLayout(new FormLayout(
+				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("right:default"),
+						FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC, },
+				new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
+						FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
+						FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, }));
 
-        JRadioButton radioTCP = new JRadioButton("TCP");
-        radioTCP.setMnemonic(KeyEvent.VK_T);
-        radioTCP.setActionCommand("tcp");
-        radioTCP.addActionListener(this);
+		JRadioButton radioSerial = new JRadioButton("Serial");
+		radioSerial.setMnemonic(KeyEvent.VK_S);
+		radioSerial.setActionCommand("serial");
+		radioSerial.addActionListener(this);
 
-        commsMethodButtonGroup = new ButtonGroup();
-        commsMethodButtonGroup.add(radioSerial);
-        commsMethodButtonGroup.add(radioTCP);
+		JRadioButton radioTCP = new JRadioButton("TCP");
+		radioTCP.setMnemonic(KeyEvent.VK_T);
+		radioTCP.setActionCommand("tcp");
+		radioTCP.addActionListener(this);
 
-        panelComms.add(radioSerial, "4, 2, fill, default");
-        panelComms.add(radioTCP, "4, 4, fill, default");
+		commsMethodButtonGroup = new ButtonGroup();
+		commsMethodButtonGroup.add(radioSerial);
+		commsMethodButtonGroup.add(radioTCP);
 
-        commsMethod = new JTextField();
-        commsMethod.setVisible(false);
-        panelComms.add(commsMethod, "4, 6, fill, default");
+		panelComms.add(radioSerial, "4, 2, fill, default");
+		panelComms.add(radioTCP, "4, 4, fill, default");
 
-        JLabel lblConnectionKeepAlive = new JLabel("Keep Alive");
-        panelComms.add(lblConnectionKeepAlive, "2, 8, right, default");
-        
-        connectionKeepAlive = new JCheckBox("");
-        panelComms.add(connectionKeepAlive, "4, 8");
+		commsMethod = new JTextField();
+		commsMethod.setVisible(false);
+		panelComms.add(commsMethod, "4, 6, fill, default");
 
-        //Serial config code
-        panelSerial = new JPanel();
-        panelSerial.setBorder(new TitledBorder(null, "Serial Port", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        contentPanel.add(panelSerial);
-        panelSerial.setLayout(new FormLayout(new ColumnSpec[]{
-                FormSpecs.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("right:default"),
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,},
-                new RowSpec[]{
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,
-                        FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC,}));
+		JLabel lblConnectionKeepAlive = new JLabel("Keep Alive");
+		panelComms.add(lblConnectionKeepAlive, "2, 8, right, default");
 
-        JLabel lblPortName = new JLabel("Port");
-        panelSerial.add(lblPortName, "2, 2, right, default");
+		connectionKeepAlive = new JCheckBox("");
+		panelComms.add(connectionKeepAlive, "4, 8");
 
-        comboBoxPort = new JComboBox();
-        panelSerial.add(comboBoxPort, "4, 2, fill, default");
+		// Serial config code
+		panelSerial = new JPanel();
+		panelSerial
+				.setBorder(new TitledBorder(null, "Serial Port", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		contentPanel.add(panelSerial);
+		panelSerial.setLayout(new FormLayout(
+				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("right:default"),
+						FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC, },
+				new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
+						FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
+						FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, }));
 
-        JLabel lblBaudRate = new JLabel("Baud");
-        panelSerial.add(lblBaudRate, "2, 4, right, default");
+		JLabel lblPortName = new JLabel("Port");
+		panelSerial.add(lblPortName, "2, 2, right, default");
 
-        comboBoxBaud = new JComboBox();
-        panelSerial.add(comboBoxBaud, "4, 4, fill, default");
+		comboBoxPort = new JComboBox();
+		panelSerial.add(comboBoxPort, "4, 2, fill, default");
 
-        comboBoxBaud.addItem(new Integer(110));
-        comboBoxBaud.addItem(new Integer(300));
-        comboBoxBaud.addItem(new Integer(600));
-        comboBoxBaud.addItem(new Integer(1200));
-        comboBoxBaud.addItem(new Integer(2400));
-        comboBoxBaud.addItem(new Integer(4800));
-        comboBoxBaud.addItem(new Integer(9600));
-        comboBoxBaud.addItem(new Integer(14400));
-        comboBoxBaud.addItem(new Integer(19200));
-        comboBoxBaud.addItem(new Integer(38400));
-        comboBoxBaud.addItem(new Integer(56000));
-        comboBoxBaud.addItem(new Integer(57600));
-        comboBoxBaud.addItem(new Integer(115200));
-        comboBoxBaud.addItem(new Integer(128000));
-        comboBoxBaud.addItem(new Integer(153600));
-        comboBoxBaud.addItem(new Integer(230400));
-        comboBoxBaud.addItem(new Integer(250000));
-        comboBoxBaud.addItem(new Integer(256000));
-        comboBoxBaud.addItem(new Integer(460800));
-        comboBoxBaud.addItem(new Integer(921600));
+		JLabel lblBaudRate = new JLabel("Baud");
+		panelSerial.add(lblBaudRate, "2, 4, right, default");
 
-        JLabel lblParity = new JLabel("Parity");
-        panelSerial.add(lblParity, "2, 6, right, default");
+		comboBoxBaud = new JComboBox();
+		panelSerial.add(comboBoxBaud, "4, 4, fill, default");
 
-        parityComboBox = new JComboBox(SerialPortCommunications.Parity.values());
-        panelSerial.add(parityComboBox, "4, 6, fill, default");
+		comboBoxBaud.addItem(new Integer(110));
+		comboBoxBaud.addItem(new Integer(300));
+		comboBoxBaud.addItem(new Integer(600));
+		comboBoxBaud.addItem(new Integer(1200));
+		comboBoxBaud.addItem(new Integer(2400));
+		comboBoxBaud.addItem(new Integer(4800));
+		comboBoxBaud.addItem(new Integer(9600));
+		comboBoxBaud.addItem(new Integer(14400));
+		comboBoxBaud.addItem(new Integer(19200));
+		comboBoxBaud.addItem(new Integer(38400));
+		comboBoxBaud.addItem(new Integer(56000));
+		comboBoxBaud.addItem(new Integer(57600));
+		comboBoxBaud.addItem(new Integer(115200));
+		comboBoxBaud.addItem(new Integer(128000));
+		comboBoxBaud.addItem(new Integer(153600));
+		comboBoxBaud.addItem(new Integer(230400));
+		comboBoxBaud.addItem(new Integer(250000));
+		comboBoxBaud.addItem(new Integer(256000));
+		comboBoxBaud.addItem(new Integer(460800));
+		comboBoxBaud.addItem(new Integer(921600));
 
-        JLabel lblDataBits = new JLabel("Data Bits");
-        panelSerial.add(lblDataBits, "2, 8, right, default");
+		JLabel lblParity = new JLabel("Parity");
+		panelSerial.add(lblParity, "2, 6, right, default");
 
-        dataBitsComboBox = new JComboBox(SerialPortCommunications.DataBits.values());
-        panelSerial.add(dataBitsComboBox, "4, 8, fill, default");
+		parityComboBox = new JComboBox(SerialPortCommunications.Parity.values());
+		panelSerial.add(parityComboBox, "4, 6, fill, default");
 
-        JLabel lblStopBits = new JLabel("Stop Bits");
-        panelSerial.add(lblStopBits, "2, 10, right, default");
+		JLabel lblDataBits = new JLabel("Data Bits");
+		panelSerial.add(lblDataBits, "2, 8, right, default");
 
-        stopBitsComboBox = new JComboBox(SerialPortCommunications.StopBits.values());
-        panelSerial.add(stopBitsComboBox, "4, 10, fill, default");
+		dataBitsComboBox = new JComboBox(SerialPortCommunications.DataBits.values());
+		panelSerial.add(dataBitsComboBox, "4, 8, fill, default");
 
-        JLabel lblFlowControl = new JLabel("Flow Control");
-        panelSerial.add(lblFlowControl, "2, 12, right, default");
+		JLabel lblStopBits = new JLabel("Stop Bits");
+		panelSerial.add(lblStopBits, "2, 10, right, default");
 
-        flowControlComboBox = new JComboBox(SerialPortCommunications.FlowControl.values());
-        panelSerial.add(flowControlComboBox, "4, 12, fill, default");
+		stopBitsComboBox = new JComboBox(SerialPortCommunications.StopBits.values());
+		panelSerial.add(stopBitsComboBox, "4, 10, fill, default");
 
-        JLabel lblSetDtr = new JLabel("Set DTR");
-        panelSerial.add(lblSetDtr, "2, 14");
+		JLabel lblFlowControl = new JLabel("Flow Control");
+		panelSerial.add(lblFlowControl, "2, 12, right, default");
 
-        setDtrCheckbox = new JCheckBox("");
-        panelSerial.add(setDtrCheckbox, "4, 14");
+		flowControlComboBox = new JComboBox(SerialPortCommunications.FlowControl.values());
+		panelSerial.add(flowControlComboBox, "4, 12, fill, default");
 
-        JLabel lblSetRts = new JLabel("Set RTS");
-        panelSerial.add(lblSetRts, "2, 16");
+		JLabel lblSetDtr = new JLabel("Set DTR");
+		panelSerial.add(lblSetDtr, "2, 14");
 
-        setRtsCheckbox = new JCheckBox("");
-        panelSerial.add(setRtsCheckbox, "4, 16");
-        
-        JLabel lblPortName2 = new JLabel("Port2");
-        panelSerial.add(lblPortName2, "2, 18, right, default");
-        
-        comboBoxPort2 = new JComboBox();
-        panelSerial.add(comboBoxPort2, "4, 18, fill, default");
+		setDtrCheckbox = new JCheckBox("");
+		panelSerial.add(setDtrCheckbox, "4, 14");
 
-        comboBoxPort.addPopupMenuListener(new PopupMenuListener() {
-            @Override
-            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                refreshPortList();
-            }
+		JLabel lblSetRts = new JLabel("Set RTS");
+		panelSerial.add(lblSetRts, "2, 16");
 
-            @Override
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-            }
+		setRtsCheckbox = new JCheckBox("");
+		panelSerial.add(setRtsCheckbox, "4, 16");
 
-            @Override
-            public void popupMenuCanceled(PopupMenuEvent e) {
-            }
-        });
-        
-        comboBoxPort2.addPopupMenuListener(new PopupMenuListener() {
-            @Override
-            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                refreshPortList2();
-            }
+		JLabel lblPortName2 = new JLabel("Port2");
+		panelSerial.add(lblPortName2, "2, 18, right, default");
 
-            @Override
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-            }
+		comboBoxPort2 = new JComboBox();
+		panelSerial.add(comboBoxPort2, "4, 18, fill, default");
 
-            @Override
-            public void popupMenuCanceled(PopupMenuEvent e) {
-            }
-        });
+		comboBoxPort.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				refreshPortList();
+			}
 
-        refreshPortList();
-        refreshPortList2();
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			}
 
-        // TCP config code
-        panelTcp = new JPanel();
-        panelTcp.setBorder(new TitledBorder(null, "TCP", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        contentPanel.add(panelTcp);
-        panelTcp.setLayout(new FormLayout(new ColumnSpec[] {
-                FormSpecs.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("right:default"),
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,},
-            new RowSpec[] {
-                FormSpecs.RELATED_GAP_ROWSPEC,
-                FormSpecs.DEFAULT_ROWSPEC,
-                FormSpecs.RELATED_GAP_ROWSPEC,
-                FormSpecs.DEFAULT_ROWSPEC,}));
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+			}
+		});
 
-        JLabel lblIpAddress = new JLabel("IP Address");
-        lblIpAddress.setToolTipText("IP address or host-name. Set to \"GcodeServer\" for an internally simulated Controller.");
-        panelTcp.add(lblIpAddress, "2, 2, right, default");
+		comboBoxPort2.addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				refreshPortList2();
+			}
 
-        ipAddressTextField = new JTextField(17);
-        panelTcp.add(ipAddressTextField, "4, 2, fill, default");
-        ipAddressTextField.setColumns(10);
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			}
 
-        JLabel lblPort = new JLabel("Port");
-        panelTcp.add(lblPort, "2, 4, right, default");
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+			}
+		});
 
-        portTextField = new JTextField(17);
-        panelTcp.add(portTextField, "4, 4, fill, default");
-        portTextField.setColumns(10);
+		refreshPortList();
+		refreshPortList2();
 
-        //Finally, click a radio button to initialise enabled/disabled setting
-        if(driver.getCommunicationsType().equals("serial")){ radioSerial.doClick(); }
-        if(driver.getCommunicationsType().equals("tcp")) { radioTCP.doClick(); }
-    }
+		// TCP config code
+		panelTcp = new JPanel();
+		panelTcp.setBorder(new TitledBorder(null, "TCP", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		contentPanel.add(panelTcp);
+		panelTcp.setLayout(new FormLayout(
+				new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("right:default"),
+						FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC, },
+				new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
+						FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
+						FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+						FormSpecs.DEFAULT_ROWSPEC, }));
 
-    private void setPanelEnabled(JPanel panel, Boolean isEnabled) {
-        panel.setEnabled(isEnabled);
+		JLabel lblIpAddress = new JLabel("IP Address");
+		panelTcp.add(lblIpAddress, "2, 2, right, default");
 
-        for (Component cp : panel.getComponents()) {
-            cp.setEnabled(isEnabled);
-        }
-    }
+		ipAddressTextField = new JTextField(17);
+		panelTcp.add(ipAddressTextField, "4, 2, fill, default");
+		ipAddressTextField.setColumns(5);
 
-    public void actionPerformed(ActionEvent e) {
-        // Enable/Disable controls for selected comms method
-        if (e.getActionCommand().equals("serial")) {
-            setPanelEnabled(panelSerial, true);
-            setPanelEnabled(panelTcp, false);
-        } else {
-            setPanelEnabled(panelSerial, false);
-            setPanelEnabled(panelTcp, true);
-        }
-        commsMethod.setText(e.getActionCommand());
-    }
+		JLabel lblPort = new JLabel("Port");
+		panelTcp.add(lblPort, "2, 4, right, default");
 
-    private void refreshPortList() {
-        if (driver != null) {
-            comboBoxPort.removeAllItems();
-            boolean exists = false;
-            String[] portNames = SerialPortCommunications.getPortNames();
-            for (String portName : portNames) {
-                comboBoxPort.addItem(portName);
-                if (portName.equals(driver.getPortName())) {
-                    exists = true;
-                }
-            }
-            if (!exists && driver.getPortName() != null) {
-                comboBoxPort.addItem(driver.getPortName());
-            }
-        }
-    }
+		portTextField = new JTextField(17);
+		panelTcp.add(portTextField, "4, 4, fill, default");
+		portTextField.setColumns(5);
 
-    
-    private void refreshPortList2() {
-        if (driver != null) {
-            comboBoxPort2.removeAllItems();            
-            boolean exists = false;
-            String[] portNames = SerialPortCommunications.getPortNames();
-            for (String portName : portNames) {
-                comboBoxPort2.addItem(portName);
-                if (portName.equals(driver.getPortName())) {
-                    exists = true;
-                }
-            }
-            if (!exists && driver.getPortName() != null) {
-                comboBoxPort2.addItem(driver.getPortName());
-            }
-        }
-    }
-    
-    @Override
-    public void createBindings() {
-        IntegerConverter integerConverter = new IntegerConverter();
+		// Finally, click a radio button to initialise enabled/disabled setting
+		if (driver.getCommunicationsType().equals("serial")) {
+			radioSerial.doClick();
+		}
+		if (driver.getCommunicationsType().equals("tcp")) {
+			radioTCP.doClick();
+		}
+	}
 
-        addWrappedBinding(driver, "name", driverName, "text");
+	private void setPanelEnabled(JPanel panel, Boolean isEnabled) {
+		panel.setEnabled(isEnabled);
 
-        addWrappedBinding(driver, "communicationsType", commsMethod, "text");
-        addWrappedBinding(driver, "connectionKeepAlive", connectionKeepAlive, "selected");
-        
-        addWrappedBinding(driver, "portName", comboBoxPort, "selectedItem");
-        addWrappedBinding(driver, "baud", comboBoxBaud, "selectedItem");
-        addWrappedBinding(driver, "parity", parityComboBox, "selectedItem");
-        addWrappedBinding(driver, "stopBits", stopBitsComboBox, "selectedItem");
-        addWrappedBinding(driver, "dataBits", dataBitsComboBox, "selectedItem");
-        addWrappedBinding(driver, "flowControl", flowControlComboBox, "selectedItem");
-        addWrappedBinding(driver, "setDtr", setDtrCheckbox, "selected");
-        addWrappedBinding(driver, "setRts", setRtsCheckbox, "selected");        
-        
-        addWrappedBinding(driver, "ipAddress", ipAddressTextField, "text");
-        addWrappedBinding(driver, "port", portTextField, "text", integerConverter);
+		for (Component cp : panel.getComponents()) {
+			cp.setEnabled(isEnabled);
+		}
+	}
 
-        ComponentDecorators.decorateWithAutoSelect(driverName);
-    }
+	public void actionPerformed(ActionEvent e) {
+		// Enable/Disable controls for selected comms method
+		if (e.getActionCommand().equals("serial")) {
+			setPanelEnabled(panelSerial, true);
+			setPanelEnabled(panelTcp, false);
+		} else {
+			setPanelEnabled(panelSerial, false);
+			setPanelEnabled(panelTcp, true);
+		}
+		commsMethod.setText(e.getActionCommand());
+	}
+
+	private void refreshPortList() {
+		if (driver != null) {
+			comboBoxPort.removeAllItems();
+			boolean exists = false;
+			String[] portNames = SerialPortCommunications.getPortNames();
+			for (String portName : portNames) {
+				comboBoxPort.addItem(portName);
+				if (portName.equals(driver.getPortName())) {
+					exists = true;
+				}
+			}
+			if (!exists && driver.getPortName() != null) {
+				comboBoxPort.addItem(driver.getPortName());
+			}
+		}
+	}
+
+	private void refreshPortList2() {
+		if (driver != null) {
+			comboBoxPort2.removeAllItems();
+			boolean exists = false;
+			String[] portNames = SerialPortCommunications.getPortNames();
+			for (String portName : portNames) {
+				comboBoxPort2.addItem(portName);
+				if (portName.equals(driver.getPortName())) {
+					exists = true;
+				}
+			}
+			if (!exists && driver.getPortName() != null) {
+				comboBoxPort2.addItem(driver.getPortName());
+			}
+		}
+	}
+
+	@Override
+	public void createBindings() {
+		IntegerConverter integerConverter = new IntegerConverter();
+
+		addWrappedBinding(driver, "communicationsType", commsMethod, "text");
+		addWrappedBinding(driver, "connectionKeepAlive", connectionKeepAlive, "selected");
+
+		addWrappedBinding(driver, "portName", comboBoxPort, "selectedItem");
+		addWrappedBinding(driver, "portName2", comboBoxPort2, "selectedItem");
+		addWrappedBinding(driver, "baud", comboBoxBaud, "selectedItem");
+		addWrappedBinding(driver, "parity", parityComboBox, "selectedItem");
+		addWrappedBinding(driver, "stopBits", stopBitsComboBox, "selectedItem");
+		addWrappedBinding(driver, "dataBits", dataBitsComboBox, "selectedItem");
+		addWrappedBinding(driver, "flowControl", flowControlComboBox, "selectedItem");
+		addWrappedBinding(driver, "setDtr", setDtrCheckbox, "selected");
+		addWrappedBinding(driver, "setRts", setRtsCheckbox, "selected");
+
+		addWrappedBinding(driver, "ipAddress", ipAddressTextField, "text");
+		addWrappedBinding(driver, "port", portTextField, "text", integerConverter);
+	}
 }
