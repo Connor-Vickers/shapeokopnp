@@ -66,6 +66,9 @@ public class SerialPortCommunications extends ReferenceDriverCommunications {
             this.mask = mask;
         }
     }
+    
+    @Attribute(required = false)
+    protected String portName2 = "";//todo set some how
 
     @Attribute(required = false)
     protected String portName = "";
@@ -96,6 +99,31 @@ public class SerialPortCommunications extends ReferenceDriverCommunications {
 
 
     private SerialPort serialPort;
+    private SerialPort serialPort2;
+    
+    public synchronized void connect2() throws Exception {
+        disconnect2();
+        serialPort2 = SerialPort.getCommPort(portName2);
+        serialPort2.openPort(0);
+        serialPort2.setComPortParameters(baud, dataBits.mask, stopBits.mask, parity.mask);
+        serialPort2.setFlowControl(flowControl.mask);
+        if (setDtr) {
+            serialPort2.setDTR();
+        }
+        if (setRts) {
+            serialPort2.setRTS();
+        }
+        serialPort2.setComPortTimeouts(
+                SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 500, 0);
+    }
+
+    public synchronized void disconnect2() throws Exception {
+        if (serialPort2 != null && serialPort2.isOpen()) {
+            serialPort2.closePort();
+            serialPort2 = null;
+        }
+    }    
+    
 
     public synchronized void connect() throws Exception {
         disconnect();
