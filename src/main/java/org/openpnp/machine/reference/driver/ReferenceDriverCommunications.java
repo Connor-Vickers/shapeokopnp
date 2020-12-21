@@ -51,12 +51,16 @@ public abstract class ReferenceDriverCommunications {
     protected LineEndingType lineEndingType = LineEndingType.LF;
 
     abstract public void connect() throws Exception;
+    abstract public void connect2() throws Exception;
     abstract public void disconnect() throws Exception;
-
+    abstract public void disconnect2() throws Exception;
+    
     abstract public String getConnectionName();
-
+    abstract public String getConnectionName2();
+    
     abstract public void writeBytes(byte[] data) throws IOException;
-
+    abstract public void writeBytes2(byte[] data) throws IOException;
+    
     abstract public int read() throws TimeoutException, IOException;
 
     /**
@@ -74,6 +78,11 @@ public abstract class ReferenceDriverCommunications {
     public void writeLine(String data) throws IOException {
         writeBytes(data.getBytes());
         writeBytes(getLineEndingType().getLineEnding().getBytes());
+    }
+    
+    public void writeLine2(String data) throws IOException {
+        writeBytes2(data.getBytes());
+        writeBytes2(getLineEndingType().getLineEnding().getBytes());
     }
 
     /**
@@ -115,4 +124,5 @@ public abstract class ReferenceDriverCommunications {
     public LineEndingType getLineEndingType() {
         return lineEndingType;
     }
+	
 }

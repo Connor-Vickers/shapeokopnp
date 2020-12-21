@@ -231,12 +231,13 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named, Runna
         commands.add(new Command(null, CommandType.COMMAND_CONFIRM_REGEX, ".*ok.*"));
         commands.add(new Command(null, CommandType.CONNECT_COMMAND, "$X; unlock machine\nG21 ; Set millimeters mode\nG90 ; Set absolute positioning mode"));
         commands.add(new Command(null, CommandType.HOME_COMMAND, "$H ; Home all axes"));
-        commands.add(new Command(null, CommandType.MOVE_TO_COMMAND, "G0 {X:X%.4f} {Y:Y%.4f} {Z:Z%.4f} {Rotation:E%.4f} F{FeedRate:%.0f} ; Send standard Gcode move"));
+        commands.add(new Command(null, CommandType.MOVE_TO_COMMAND, "G0 {X:X%.4f} {Y:Y%.4f} {Z:Z%.4f} F{FeedRate:%.0f} |{Rotation:E%.4f}; Send standard Gcode move"));
         commands.add(new Command(null, CommandType.MOVE_TO_COMPLETE_COMMAND, "G4 P0.01 ; Wait for moves to complete before returning"));
     }
 
     public synchronized void connect() throws Exception {
         getCommunications().connect();
+        getCommunications().connect2();
 
         connected = false;
         readerThread = new Thread(this);
@@ -980,6 +981,7 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named, Runna
 
         try {
             getCommunications().disconnect();
+            getCommunications().disconnect2();
         }
         catch (Exception e) {
             Logger.error("disconnect()", e);
@@ -1037,18 +1039,39 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named, Runna
     }
 
     protected List<String> sendCommandNoFlush(String command, long timeout) throws Exception {
+    	String command2 = "";
+    	if(command != null) {
+    		String[] splitCommand = command.split("\\|");
+    		if (splitCommand.length > 1){
+        		command2 = splitCommand[1];
+    		}
+    		command = splitCommand[0];
+    	}
+    	
         List<String> responses = new ArrayList<>();
 
         Logger.debug("sendCommand({}, {})...", command, timeout);
+        Logger.debug("sendCommand2({}, {})...", command2, timeout);
 
         // Send the command, if one was specified
         if (command != null) {
             if (backslashEscapedCharactersEnabled) {
                 command = unescape(command);
+                command2 = unescape(command2);
             }
             Logger.trace("[{}] >> {}", getCommunications().getConnectionName(), command);
+            Logger.trace("[{}] >> {}", getCommunications().getConnectionName2(), command2);
+
             try {
-                getCommunications().writeLine(command);
+				getCommunications().writeLine2(command2);
+            }
+            catch (IOException ex) {
+                Logger.error("Failed to write command2: ", command2);
+            }
+            
+            
+            try {
+				getCommunications().writeLine(command);
             }
             catch (IOException ex) {
                 Logger.error("Failed to write command: ", command);

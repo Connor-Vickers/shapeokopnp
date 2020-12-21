@@ -87,6 +87,30 @@ public class TcpCommunications extends ReferenceDriverCommunications {
     public void setPort(int port) {
         this.port = port;
     }
+
+	@Override
+	public String getConnectionName2() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void writeBytes2(byte[] data) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void connect2() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void disconnect2() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
     
 }
 
