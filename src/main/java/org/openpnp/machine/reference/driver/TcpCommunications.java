@@ -103,9 +103,35 @@ public class TcpCommunications extends ReferenceDriverCommunications {
         this.port = port;
     }
 
+<<<<<<< HEAD
     public void setDriver(AbstractReferenceDriver driver) {
         this.driver = driver;
     }
+=======
+	@Override
+	public String getConnectionName2() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void writeBytes2(byte[] data) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void connect2() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void disconnect2() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+>>>>>>> WIP adding second port
     
 }
 

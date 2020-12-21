@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
+import org.pmw.tinylog.Logger;
 import org.simpleframework.xml.Attribute;
 
 import com.fazecast.jSerialComm.SerialPort;
@@ -177,17 +178,29 @@ public class SerialPortCommunications extends ReferenceDriverCommunications {
     }
 
     public void writeBytes(byte[] data) throws IOException {
+    	System.out.println(data);
         int l = serialPort.writeBytes(data, data.length);
         if (l == -1) {
             throw new IOException("Write error.");
         }
     }
-
-
+    
+    public void writeBytes2(byte[] data) throws IOException {
+    	System.out.println(data);
+        int l = serialPort2.writeBytes(data, data.length);
+        if (l == -1) {
+            throw new IOException("Write error 2.");
+        }
+    }
+    
     public String getConnectionName() {
         return "serial://" + portName;
     }
 
+    public String getConnectionName2() {
+        return "serial://" + portName2;
+    }
+    
     public String getPortName() {
         return portName;
     }

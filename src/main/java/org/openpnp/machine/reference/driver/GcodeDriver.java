@@ -314,12 +314,13 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named {
         commands.add(new Command(null, CommandType.COMMAND_CONFIRM_REGEX, ".*ok.*"));
         commands.add(new Command(null, CommandType.CONNECT_COMMAND, "$X; unlock machine\nG21 ; Set millimeters mode\nG90 ; Set absolute positioning mode"));
         commands.add(new Command(null, CommandType.HOME_COMMAND, "$H ; Home all axes"));
-        commands.add(new Command(null, CommandType.MOVE_TO_COMMAND, "G0 {X:X%.4f} {Y:Y%.4f} {Z:Z%.4f} {Rotation:E%.4f} F{FeedRate:%.0f} ; Send standard Gcode move"));
+        commands.add(new Command(null, CommandType.MOVE_TO_COMMAND, "G0 {X:X%.4f} {Y:Y%.4f} {Z:Z%.4f} F{FeedRate:%.0f} |{Rotation:E%.4f}; Send standard Gcode move"));
         commands.add(new Command(null, CommandType.MOVE_TO_COMPLETE_COMMAND, "G4 P0.01 ; Wait for moves to complete before returning"));
     }
 
     public synchronized void connect() throws Exception {
         getCommunications().connect();
+        getCommunications().connect2();
         connected = false;
 
         // Wait a bit while the controller starts up
@@ -865,10 +866,8 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named {
      *  Disconnect the threads used for communications.
      */
     protected void disconnectThreads() {
-        try {
-            if (readerThread != null && readerThread.isAlive()) {
-                readerThread.join(3000);
-            }
+            getCommunications().disconnect();
+            getCommunications().disconnect2();
         }
         catch (Exception e) {
             Logger.error("disconnect()", e);
@@ -935,33 +934,46 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named {
         waitForConfirmation(command, timeout);
     }
 
-    protected Line waitForConfirmation(String command, long timeout)
-            throws Exception {
-        if (getCommand(null, CommandType.COMMAND_CONFIRM_REGEX) == null) {
-           Logger.warn(getName()+" configuration error: COMMAND_CONFIRM_REGEX missing. Not waiting for confirmation.");
-           return null;
-        }
+    protected List<String> sendCommandNoFlush(String command, long timeout) throws Exception {
+    	String command2 = "";
+    	if(command != null) {
+    		String[] splitCommand = command.split("\\|");
+    		if (splitCommand.length > 1){
+        		command2 = splitCommand[1];
+    		}
+    		command = splitCommand[0];
+    	}
+    	
+        List<String> responses = new ArrayList<>();
 
-        if (timeout == -1) {
-            timeout = infinityTimeoutMilliseconds;
-        }
-        Line receivedConfirmation = receivedConfirmationsQueue.poll(timeout, TimeUnit.MILLISECONDS);
-        if (receivedConfirmation != null) {
-            Logger.trace("[{}] confirmed {}", getCommunications().getConnectionName(), command);
-            return receivedConfirmation;
-        }
-        // Timeout expired.
-        throw new Exception(getCommunications().getConnectionName()+" timeout waiting for response to "+command);
-    }
+        Logger.debug("sendCommand({}, {})...", command, timeout);
+        Logger.debug("sendCommand2({}, {})...", command2, timeout);
 
-    protected void bailOnError() throws Exception {
-        if (errorResponse != null) {
-            Line error = errorResponse; 
-            errorResponse = null;
-            throw new Exception(getCommunications().getConnectionName()+" error response from controller: " + error);
-        }
-        if (readerThread == null || !readerThread.isAlive()) {
-            throw new Exception(getCommunications().getConnectionName()+" IO Error on reading from the controller.");
+        // Send the command, if one was specified
+        if (command != null) {
+            if (backslashEscapedCharactersEnabled) {
+                command = unescape(command);
+                command2 = unescape(command2);
+            }
+            Logger.trace("[{}] >> {}", getCommunications().getConnectionName(), command);
+            Logger.trace("[{}] >> {}", getCommunications().getConnectionName2(), command2);
+
+            try {
+				getCommunications().writeLine2(command2);
+            }
+            catch (IOException ex) {
+                Logger.error("Failed to write command2: ", command2);
+            }
+            
+            
+            try {
+				getCommunications().writeLine(command);
+            }
+            catch (IOException ex) {
+                Logger.error("Failed to write command: ", command);
+                disconnect();
+                Configuration.get().getMachine().setEnabled(false);
+            }
         }
     }
 
