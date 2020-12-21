@@ -314,7 +314,7 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named {
         commands.add(new Command(null, CommandType.COMMAND_CONFIRM_REGEX, ".*ok.*"));
         commands.add(new Command(null, CommandType.CONNECT_COMMAND, "$X; unlock machine\nG21 ; Set millimeters mode\nG90 ; Set absolute positioning mode"));
         commands.add(new Command(null, CommandType.HOME_COMMAND, "$H ; Home all axes"));
-        commands.add(new Command(null, CommandType.MOVE_TO_COMMAND, "G0 {X:X%.4f} {Y:Y%.4f} {Z:Z%.4f} F{FeedRate:%.0f} |{Rotation:E%.4f}; Send standard Gcode move"));
+        commands.add(new Command(null, CommandType.MOVE_TO_COMMAND, "G0 {X:X%.4f} {Y:Y%.4f} {Z:Z%.4f} F{FeedRate:%.0f} |{Rotation:R%.4f}; Send standard Gcode move"));
         commands.add(new Command(null, CommandType.MOVE_TO_COMPLETE_COMMAND, "G4 P0.01 ; Wait for moves to complete before returning"));
     }
 
