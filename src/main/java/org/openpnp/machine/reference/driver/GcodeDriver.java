@@ -321,6 +321,7 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named {
     public synchronized void connect() throws Exception {
         getCommunications().connect();
         getCommunications().connect2();
+
         connected = false;
 
         // Wait a bit while the controller starts up

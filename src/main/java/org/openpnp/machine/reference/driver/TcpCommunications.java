@@ -103,11 +103,10 @@ public class TcpCommunications extends ReferenceDriverCommunications {
         this.port = port;
     }
 
-<<<<<<< HEAD
     public void setDriver(AbstractReferenceDriver driver) {
         this.driver = driver;
     }
-=======
+
 	@Override
 	public String getConnectionName2() {
 		// TODO Auto-generated method stub
@@ -131,7 +130,10 @@ public class TcpCommunications extends ReferenceDriverCommunications {
 		// TODO Auto-generated method stub
 		
 	}
+<<<<<<< HEAD
 >>>>>>> WIP adding second port
+=======
+>>>>>>> f7b245f943979f161e7bc4d2d1f83b119cea37b9
     
 }
 
