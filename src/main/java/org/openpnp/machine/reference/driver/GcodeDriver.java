@@ -1101,8 +1101,12 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named {
             command = compressedCommand.toString();
             //Logger.trace("Compressed Gcode: {}", command);
         }
-        if (backslashEscapedCharactersEnabled) {
-            command = unescape(command);
+        // If a command was specified and no confirmation was found it's a timeout error.
+        if (command != null & foundError) {
+            throw new Exception("Controller raised an error: " + errorResponse);
+        }
+        if (command != null && !found && command2 == "") {
+            throw new Exception("Timeout waiting for response to " + command);
         }
         if (isLoggingGcode()) {
 
