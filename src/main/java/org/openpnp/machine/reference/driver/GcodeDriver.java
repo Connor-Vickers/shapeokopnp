@@ -1119,7 +1119,7 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named, Runna
         if (command != null & foundError) {
             throw new Exception("Controller raised an error: " + errorResponse);
         }
-        if (command != null && !found) {
+        if (command != null && !found && command2 == "") {
             throw new Exception("Timeout waiting for response to " + command);
         }
 
