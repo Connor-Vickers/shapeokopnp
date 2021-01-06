@@ -694,7 +694,7 @@ public class GcodeDriver extends AbstractReferenceDriver implements Named, Runna
             }
 
             if (includeZ) {
-            	command = substituteVariable(command, "Z", z);
+            	command = substituteVariable(command, "Z", z - 58);
             	command = substituteVariable(command, "ZF", z);
                 command = substituteVariable(command, "BacklashOffsetZ", z + backlashOffsetZ); // Backlash Compensation
                 command = substituteVariable(command, "ZDecreasing", z < zAxis.getCoordinate() ? true : null);
