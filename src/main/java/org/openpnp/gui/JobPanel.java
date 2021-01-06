@@ -784,7 +784,6 @@ public class JobPanel extends JPanel {
                     existingBoard.addSolderPastePad(pad);
                 }
                 jobPlacementsPanel.setBoardLocation(getSelection());
-                frame.getFeedersTab().updateView();
             }
         }
         catch (Exception e) {
@@ -823,7 +822,6 @@ public class JobPanel extends JPanel {
                 Job job = configuration.loadJob(file);
                 setJob(job);
                 addRecentJob(file);
-                frame.getFeedersTab().updateView();
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -1540,7 +1538,6 @@ public class JobPanel extends JPanel {
                 Job job = configuration.loadJob(file);
                 setJob(job);
                 addRecentJob(file);
-                frame.getFeedersTab().updateView();
             }
             catch (Exception e) {
                 e.printStackTrace();

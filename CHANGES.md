@@ -1,50 +1,6 @@
 This file lists major or notable changes to OpenPnP in chronological order. This is not
 a complete change list, only those that may directly interest or affect users.
 
-# 2020-12-29
-
-## Retry Bug Fixes and Improvements
-
-This is the first in a series of updates to improve retry and error handling in OpenPnP. The
-goal of this change is to fix features that were already in OpenPnP but not working correctly
-and additionally bring back (and fix) a feature that existed in OpenPnP 1.0.
-
-- Feeder.feedRetryCount now works correctly: feeds will be retried if they fail due to the feed()
-  method throwing an Exception. This most often happens in feeders that can detect they are out
-  of parts, such as Strip and Tray feeders. If a feeder fails all of it's retries it is disabled.
-
-- Feeder.pickRetryCount implemented: If the vacuum check after a pick fails, the pick and vacuum
-  check will be retried without performing another feed. Since this was not previously implemented
-  at all, but the setting was there, and this could potentially break feeders or nozzles that
-  use shutters the value will be reset to 0 on initial load of this version. You can set it
-  if you want to use the new functionality.
-
-- Part.pickRetryCount: This new retry value controls how many times the feed-pick sequence will
-  be retried for a part. Defaults to 0. Setting this value makes it possible to automatically
-  try additional feeders when one becomes disabled.  
-
-
-# 2020-12-12
-
-## Advanced Motion Control
-
-- Simpler all-GUI setup of machine axes, axis transformations and their assignment to Nozzles, 
-  Cameras etc. (no more machine.xml hacking).
-- Making features such as Axis Mapping, Backlash Compensation, Visual Homing, Non-Squareness 
-  Compensation etc. available for all types of drivers (formerly just the GcodeDriver).
-- Allowing multiple drivers of mixed types.
-- Better control of speed factors: properly control the average speed, including 
-  acceleration/deceleration phases. A move at 50% takes exactly twice as long, regardles of 
-  how short or long the move is. 
-- Simulated Jerk Control to reduce vibrations, prevent slipping of parts on nozzles, etc.
-- Experimental: Motion Blending.
-- Asynchronous communication between OpenPnP and (multiple) controllers. Decoupled and 
-  paralellized operation. 
-- Graphical diagnostics for Motion Planning as a basis for fact based machine optimization.
-- Issues & Solutions system to automatically solve machine specific setup and migration 
-  issues, enable advanced features, generate firmware-adapted Gcode commands and regular 
-  expressions. 
-
 # 2020-06-23
 
 ## Actuator API Change (Non-Breaking)

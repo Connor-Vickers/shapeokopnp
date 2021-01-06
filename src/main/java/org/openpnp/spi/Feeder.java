@@ -25,7 +25,6 @@ import org.openpnp.model.Identifiable;
 import org.openpnp.model.Location;
 import org.openpnp.model.Named;
 import org.openpnp.model.Part;
-import org.openpnp.model.Solutions;
 
 
 
@@ -34,7 +33,7 @@ import org.openpnp.model.Solutions;
  * feeder, a tray handler, a single part in a specific location or anything else that can be used as
  * a pick source.
  */
-public interface Feeder extends Identifiable, Named, WizardConfigurable, PropertySheetHolder, Solutions.Subject {
+public interface Feeder extends Identifiable, Named, WizardConfigurable, PropertySheetHolder {
     /**
      * Return true is the Feeder is currently enabled and can be considered in Job planning.
      * 
@@ -102,18 +101,7 @@ public interface Feeder extends Identifiable, Named, WizardConfigurable, Propert
 
     public void postPick(Nozzle nozzle) throws Exception;
     
-    /**
-     * If feed() throws an Exception during job processing, the job processor will retry the
-     * feed() call this many times before raising the error.
-     * @return
-     */
     public int getFeedRetryCount();
     
-    /**
-     * If post pick checks such as isPartOn() fail during job processing, the job processor will
-     * retry the pick and check process this many times before raising the error. Note that
-     * this does not include re-feeding the part.  
-     * @return
-     */
     public int getPickRetryCount();
 }

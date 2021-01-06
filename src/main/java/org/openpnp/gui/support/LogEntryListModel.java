@@ -17,7 +17,6 @@ public class LogEntryListModel extends AbstractListModel<LogEntry> implements Wr
 
     private List<LogEntry> originalLogEntries = new ArrayList<>();
     private List<LogEntry> filteredLogEntries = new ArrayList<>(originalLogEntries);
-    private List<LogEntry> newLogEntries = new ArrayList<>();
     private HashSet<LogEntryFilter> filters = new HashSet<>();
 
     public static class LogEntryFilter {
@@ -42,43 +41,30 @@ public class LogEntryListModel extends AbstractListModel<LogEntry> implements Wr
 
     private static final int LINE_LIMIT = 10000;
 
-    /**
-     * Returns a snapshot copy of the original log entries.
-     * @return 
-     */
-    public synchronized List<LogEntry> getOriginalLogEntries() {
-        return new ArrayList<>(originalLogEntries);
+    public List<LogEntry> getOriginalLogEntries() {
+        return originalLogEntries;
     }
 
-    /**
-     * Returns a snapshot copy of the filtered log entries.
-     * @return
-     */
-    public synchronized List<LogEntry> getFilteredLogEntries() {
-        return new ArrayList<>(filteredLogEntries);
+    public List<LogEntry> getFilteredLogEntries() {
+        return filteredLogEntries;
     }
 
     @Override
-    public synchronized int getSize() {
+    public int getSize() {
         return filteredLogEntries.size();
     }
 
     @Override
-    public synchronized LogEntry getElementAt(int index) {
-        // This check is needed to exclude race conditions in heavily threaded logging, i.e. calls to getSize()
-        // followed by getElementAt() are not atomic. 
-        if (index < filteredLogEntries.size()) {
-            return filteredLogEntries.get(index);
-        }
-        return null;
+    public LogEntry getElementAt(int index) {
+        return filteredLogEntries.get(index);
     }
 
-    public synchronized void addFilter(LogEntryFilter filter) {
+    public void addFilter(LogEntryFilter filter) {
         this.filters.add(filter);
         filter();
     }
 
-    public synchronized void removeFilter(LogEntryFilter filter) {
+    public void removeFilter(LogEntryFilter filter) {
         this.filters.remove(filter);
         filter();
     }
@@ -94,16 +80,17 @@ public class LogEntryListModel extends AbstractListModel<LogEntry> implements Wr
     }
 
     @Override
-    public synchronized void write(LogEntry logEntry) throws Exception {
-        newLogEntries.add(logEntry);
+    public void write(LogEntry logEntry) throws Exception {
+        originalLogEntries.add(logEntry);
+        trim();
     }
 
-    public synchronized void clear() {
+    public void clear() {
         this.originalLogEntries.clear();
         filter();
     }
 
-    public synchronized void filter() {
+    public void filter() {
         // Reduce all filters to a single one and apply it to our logEntries
         this.filteredLogEntries = originalLogEntries.stream().filter(
                 filters.stream().map(LogEntryFilter::getFilter).reduce(Predicate::and).orElse(t -> false)
@@ -112,22 +99,10 @@ public class LogEntryListModel extends AbstractListModel<LogEntry> implements Wr
         SwingUtilities.invokeLater(() -> fireContentsChanged(this, 0, filteredLogEntries.size() - 1));
     }
 
-    public synchronized boolean isRefreshNeeded() {
-        return !newLogEntries.isEmpty();
-    }
-
-    public synchronized void refresh() {
-        if (newLogEntries.size() > LINE_LIMIT) {
-            // New Log entries alone already surpass the limit. 
-            newLogEntries.subList(0, newLogEntries.size() - LINE_LIMIT).clear();
-            originalLogEntries.clear();
+    private void trim() {
+        if (originalLogEntries.size() > LINE_LIMIT) {
+            originalLogEntries.subList(0, originalLogEntries.size() - LINE_LIMIT).clear();
         }
-        else if (originalLogEntries.size() + newLogEntries.size() > LINE_LIMIT) {
-            // Make space for the new log entries.
-            originalLogEntries.subList(0, Math.max(0, originalLogEntries.size() - newLogEntries.size() - LINE_LIMIT)).clear();
-        }
-        originalLogEntries.addAll(newLogEntries);
-        newLogEntries.clear();
         filter();
     }
 

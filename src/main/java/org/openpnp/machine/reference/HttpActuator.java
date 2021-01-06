@@ -30,7 +30,7 @@ import org.openpnp.machine.reference.wizards.HttpActuatorConfigurationWizard;
 import org.pmw.tinylog.Logger;
 import org.simpleframework.xml.Element;
 
-public class HttpActuator extends ReferenceActuator {
+public class HttpActuator extends ReferenceActuator implements ReferenceHeadMountable {
 
     @Element(required = false)
     protected String onUrl = "";
@@ -45,9 +45,6 @@ public class HttpActuator extends ReferenceActuator {
 
     @Override
     public void actuate(boolean on) throws Exception {
-        if (isCoordinatedBeforeActuate()) {
-            coordinateWithMachine(false);
-        }
         Logger.debug("{}.actuate({})", getName(), on);
         // getDriver().actuate(this, on);
         URL obj = null;
@@ -82,17 +79,13 @@ public class HttpActuator extends ReferenceActuator {
         Logger.debug("{}.HTTPActuate responseCode: {} )", getName(), responseCode);
         Logger.debug("{}.HTTPActuate response: {} )", getName(), response);
         this.on = on;
-        setLastActuationValue(on);
 
-        if (isCoordinatedAfterActuate()) {
-            coordinateWithMachine(true);
-        }
         getMachine().fireMachineHeadActivity(head);
     }
 
     @Override
     public Wizard getConfigurationWizard() {
-        return new HttpActuatorConfigurationWizard(getMachine(), this);
+        return new HttpActuatorConfigurationWizard(this);
     }
 
     public String getOnUrl() {

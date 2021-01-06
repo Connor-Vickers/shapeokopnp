@@ -9,7 +9,6 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeoutException;
 
 import org.openpnp.machine.reference.driver.ReferenceDriverCommunications.LineEndingType;
-import org.openpnp.util.GcodeServer;
 import org.simpleframework.xml.Attribute;
 
 /**
@@ -30,20 +29,10 @@ public class TcpCommunications extends ReferenceDriverCommunications {
     protected Socket clientSocket;
     protected BufferedReader input;
     protected DataOutputStream output;
-    protected GcodeServer gcodeServer;
-    protected AbstractReferenceDriver driver;
 
     public synchronized void connect() throws Exception {
         disconnect();
-        if (ipAddress.equals("GcodeServer")) {
-            gcodeServer = new GcodeServer();
-            gcodeServer.setDriver(driver);
-            port = gcodeServer.getListenerPort();
-            clientSocket = new Socket("localhost", port);
-        }
-        else {
-            clientSocket = new Socket(ipAddress,port);
-        }
+        clientSocket = new Socket(ipAddress,port);
         input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         output = new DataOutputStream(clientSocket.getOutputStream());
     }
@@ -54,10 +43,6 @@ public class TcpCommunications extends ReferenceDriverCommunications {
             input = null;
             output = null;
             clientSocket = null;
-        }
-        if (gcodeServer != null) {
-            gcodeServer.shutdown();
-            gcodeServer = null;
         }
     }
 
@@ -103,10 +88,6 @@ public class TcpCommunications extends ReferenceDriverCommunications {
         this.port = port;
     }
 
-    public void setDriver(AbstractReferenceDriver driver) {
-        this.driver = driver;
-    }
-
 	@Override
 	public String getConnectionName2() {
 		// TODO Auto-generated method stub
@@ -130,10 +111,6 @@ public class TcpCommunications extends ReferenceDriverCommunications {
 		// TODO Auto-generated method stub
 		
 	}
-<<<<<<< HEAD
->>>>>>> WIP adding second port
-=======
->>>>>>> f7b245f943979f161e7bc4d2d1f83b119cea37b9
     
 }
 

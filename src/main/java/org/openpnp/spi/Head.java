@@ -23,9 +23,7 @@ import java.util.List;
 
 import org.openpnp.model.Identifiable;
 import org.openpnp.model.Location;
-import org.openpnp.model.Motion.MotionOption;
 import org.openpnp.model.Named;
-import org.openpnp.model.Solutions;
 
 
 /**
@@ -34,7 +32,7 @@ import org.openpnp.model.Solutions;
  * moved by moving any one of it's components. When any attached component is moved in (at least) X
  * or Y, it is expected that all components attached to the Head also move in the same axes.
  */
-public interface Head extends Identifiable, Named, WizardConfigurable, PropertySheetHolder, Solutions.Subject {
+public interface Head extends Identifiable, Named, WizardConfigurable, PropertySheetHolder {
     /**
      * Get a list of Nozzles that are attached to this head.
      * 
@@ -49,8 +47,6 @@ public interface Head extends Identifiable, Named, WizardConfigurable, PropertyS
      * @return
      */
     public Nozzle getNozzle(String id);
-    
-    public Nozzle getNozzleByName(String name);
 
     /**
      * Get a list of Actuators that are attached to this Head.
@@ -92,13 +88,6 @@ public interface Head extends Identifiable, Named, WizardConfigurable, PropertyS
     public Camera getCamera(String id);
 
     /**
-     * Get a list of all the HeadMountables attached to this Head.
-     * 
-     * @return
-     */
-    List<HeadMountable> getHeadMountables();
-
-    /**
      * Directs the Head to move to it's home position and to move any attached devices to their home
      * positions.
      */
@@ -124,29 +113,11 @@ public interface Head extends Identifiable, Named, WizardConfigurable, PropertyS
 
     public Nozzle getDefaultNozzle() throws Exception;
 
-    /**
-     * @return The default HeadMountable on a Head. A Camera takes precedence, but if none is present, 
-     * the first HeadMountable will do.
-     * @throws Exception
-     */
-    public HeadMountable getDefaultHeadMountable() throws Exception;
-
     public void setMachine(Machine machine);
     
     public Machine getMachine();
     
     public Location getParkLocation();
-
-    /**
-     * All HeadMountable motion must go through the head to map to the right
-     * drivers.  
-     * 
-     * @param hm
-     * @param location
-     * @param speed
-     * @throws Exception
-     */
-    public void moveTo(HeadMountable hm, Location location, double speed, MotionOption... options) throws Exception;
 
     /**
      * Returns true if any nozzle on the Head is currently carrying a part.

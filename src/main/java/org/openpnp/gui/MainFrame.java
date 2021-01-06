@@ -92,7 +92,6 @@ import org.openpnp.gui.support.OSXAdapter;
 import org.openpnp.gui.support.RotationCellValue;
 import org.openpnp.model.Configuration;
 import org.openpnp.model.LengthUnit;
-import org.openpnp.scripting.ScriptFileWatcher;
 import org.pmw.tinylog.Logger;
 
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -220,8 +219,6 @@ public class MainFrame extends JFrame {
 
     private ActionListener instructionsCancelActionListener;
     private ActionListener instructionsProceedActionListener;
-
-    private ScriptFileWatcher scriptFileWatcher;
 
     public MainFrame(Configuration configuration) {
         mainFrame = this;
@@ -657,8 +654,7 @@ public class MainFrame extends JFrame {
         while (!configurationLoaded) {
 	        try {
 	            configuration.load();
-	            scriptFileWatcher = new ScriptFileWatcher(configuration.getScripting());
-	            scriptFileWatcher.setMenu(mnScripts);
+	            configuration.getScripting().setMenu(mnScripts);
 	            
 	            if (Configuration.get().getMachine().getProperty("Welcome2_0_Dialog_Shown") == null) {
 	                Welcome2_0Dialog dialog = new Welcome2_0Dialog(this);
@@ -855,7 +851,8 @@ public class MainFrame extends JFrame {
                 return true;
             }
             catch (Exception e) {
-                System.err.println("Error while loading the OSXAdapter: " + e.getMessage()); //$NON-NLS-1$
+                System.err.println("Error while loading the OSXAdapter:"); //$NON-NLS-1$
+                e.printStackTrace();
             }
         }
         return false;

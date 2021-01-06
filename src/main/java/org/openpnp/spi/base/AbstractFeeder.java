@@ -13,19 +13,6 @@ import org.openpnp.spi.Nozzle;
 import org.simpleframework.xml.Attribute;
 
 public abstract class AbstractFeeder extends AbstractModelObject implements Feeder {
-    /**
-     * History:
-     * 
-     * Note: Can't actually use the @Version annotation because of a bug in SimpleXML. See
-     * http://sourceforge.net/p/simple/mailman/message/27887562/
-     * 
-     * 1.0: Initial revision. 
-     * 1.1: Migrate retryCount to feedRetryCount and zero out pickRetryCount for initial release
-     *      of feature.
-     */
-    @Attribute(required=false)
-    private double version = 1.0;
-    
     @Attribute
     protected String id;
 
@@ -41,14 +28,9 @@ public abstract class AbstractFeeder extends AbstractModelObject implements Feed
     /**
      * Note: This is feedRetryCount in reality. It was left as retryCount for backwards
      * compatibility when pickRetryCount was added. 
-     * 
-     * TODO Migration has been added and this can be removed after 2021-12-29.  
      */
     @Attribute(required=false)
-    protected Integer retryCount = 3;
-    
-    @Attribute(required=false)
-    protected int feedRetryCount = 3;
+    protected int retryCount = 3;
     
     @Attribute(required = false)
     protected int pickRetryCount = 3;
@@ -62,13 +44,6 @@ public abstract class AbstractFeeder extends AbstractModelObject implements Feed
             @Override
             public void configurationLoaded(Configuration configuration) throws Exception {
                 part = configuration.getPart(partId);
-                
-                if (version == 1.0) {
-                    feedRetryCount = retryCount;
-                    retryCount = null;
-                    pickRetryCount = 0;
-                    version = 1.1;
-                }
             }
         });
     }
@@ -111,7 +86,6 @@ public abstract class AbstractFeeder extends AbstractModelObject implements Feed
     @Override
     public void setName(String name) {
         this.name = name;
-        firePropertyChange("name", null, name);
     }
 
     @Override
@@ -120,12 +94,11 @@ public abstract class AbstractFeeder extends AbstractModelObject implements Feed
     }
 
     public int getFeedRetryCount() {
-        return feedRetryCount;
+        return retryCount;
     }
 
-    public void setFeedRetryCount(int feedRetryCount) {
-        this.feedRetryCount = feedRetryCount;
-        firePropertyChange("feedRetryCount", null, feedRetryCount);
+    public void setFeedRetryCount(int retryCount) {
+        this.retryCount = retryCount;
     }
     
     public int getPickRetryCount() {
@@ -134,7 +107,6 @@ public abstract class AbstractFeeder extends AbstractModelObject implements Feed
 
     public void setPickRetryCount(int pickRetryCount) {
         this.pickRetryCount = pickRetryCount;
-        firePropertyChange("pickRetryCount", null, pickRetryCount);
     }
 
     @Override

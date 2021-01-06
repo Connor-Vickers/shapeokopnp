@@ -34,9 +34,8 @@ import java.util.prefs.Preferences;
 
 import org.apache.commons.io.FileUtils;
 import org.openpnp.ConfigurationListener;
-import org.openpnp.scripting.Scripting;
+import org.openpnp.Scripting;
 import org.openpnp.spi.Machine;
-import org.openpnp.util.NanosecondTime;
 import org.openpnp.util.ResourceUtils;
 import org.pmw.tinylog.Logger;
 import org.simpleframework.xml.Element;
@@ -86,10 +85,6 @@ public class Configuration extends AbstractModelObject {
     private Scripting scripting;
     private EventBus bus = new EventBus();
 
-    public static boolean isInstanceInitialized() {
-        return (instance != null);
-    }
-
     public static Configuration get() {
         if (instance == null) {
             throw new Error("Configuration instance not yet initialized.");
@@ -97,49 +92,14 @@ public class Configuration extends AbstractModelObject {
         return instance;
     }
 
-    /**
-     * Initializes a new persistent Configuration singleton storing configuration files in
-     * configurationDirectory.
-     * @param configurationDirectory
-     */
     public static synchronized void initialize(File configurationDirectory) {
         instance = new Configuration(configurationDirectory);
-        instance.setLengthDisplayFormatWithUnits(PREF_LENGTH_DISPLAY_FORMAT_WITH_UNITS_DEF);
-    }
-    
-    /**
-     * Initializes a new temporary Configuration singleton storing configuration in memory only.
-     * @param configurationDirectory
-     */
-    public static synchronized void initialize() {
-        /**
-         * TODO STOPSHIP ideally this would use an in memory prefs, too, so that we
-         * don't mess with global user prefs.
-         */
-        instance = new Configuration();
         instance.setLengthDisplayFormatWithUnits(PREF_LENGTH_DISPLAY_FORMAT_WITH_UNITS_DEF);
     }
 
     private Configuration(File configurationDirectory) {
         this.configurationDirectory = configurationDirectory;
         this.prefs = Preferences.userNodeForPackage(Configuration.class);
-        File scriptingDirectory = new File(configurationDirectory, "scripts");
-        this.scripting = new Scripting(scriptingDirectory);
-    }
-    
-    private Configuration() {
-        this.prefs = Preferences.userNodeForPackage(Configuration.class);
-        this.scripting = new Scripting(null);
-        /**
-         * Setting loaded = true allows the mechanism of immediately notifying late
-         * Configuration.addListener() calls that the configuration is ready. It's a legacy
-         * hack.
-         */
-        loaded = true;
-    }
-    
-    public void setMachine(Machine machine) {
-        this.machine = machine;
     }
     
     public Scripting getScripting() {
@@ -329,9 +289,7 @@ public class Configuration extends AbstractModelObject {
 
         loaded = true;
 
-        // Tell all listeners the configuration is loaded. Use a snapshot of the list in order to tolerate new
-        // listener additions that may happen through object migration.
-        for (ConfigurationListener listener : new ArrayList<>(listeners)) {
+        for (ConfigurationListener listener : listeners) {
             listener.configurationLoaded(this);
         }
 
@@ -344,6 +302,8 @@ public class Configuration extends AbstractModelObject {
         for (ConfigurationListener listener : listeners) {
             listener.configurationComplete(this);
         }
+        
+        scripting = new Scripting();
     }
 
     public synchronized void save() throws Exception {
@@ -577,8 +537,7 @@ public class Configuration extends AbstractModelObject {
     }
 
     public static String createId(String prefix) {
-        // NanosecondTime guarantees unique Ids, even if created in rapid succession such as in migration code.
-        return prefix + NanosecondTime.get().toString(16);
+        return prefix + System.currentTimeMillis();
     }
 
     /**

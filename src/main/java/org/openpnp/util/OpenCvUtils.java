@@ -35,6 +35,7 @@ public class OpenCvUtils {
 
     static {
         nu.pattern.OpenCV.loadShared();
+        System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME);
     }
 
     public static BufferedImage toBufferedImage(Mat m) {

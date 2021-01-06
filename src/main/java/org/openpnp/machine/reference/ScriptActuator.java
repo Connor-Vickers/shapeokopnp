@@ -4,15 +4,14 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openpnp.scripting.Scripting;
+import org.openpnp.Scripting;
 import org.openpnp.gui.support.Wizard;
 import org.openpnp.machine.reference.wizards.ScriptActuatorConfigurationWizard;
 import org.openpnp.model.Configuration;
-import org.pmw.tinylog.Logger;
 import org.simpleframework.xml.Element;
 
 public class ScriptActuator extends ReferenceActuator {
-    @Element(required=false)
+    @Element
     protected String scriptName = "";
     
     private void execute(Map<String, Object> globals) throws Exception {
@@ -26,37 +25,21 @@ public class ScriptActuator extends ReferenceActuator {
     
     @Override
     public void actuate(boolean on) throws Exception {
-        if (isCoordinatedBeforeActuate()) {
-            coordinateWithMachine(false);
-        }
-        Logger.debug("{}.actuate({})", getName(), on);
         Map<String, Object> globals = new HashMap<>();
         globals.put("actuateBoolean", on);
         this.execute(globals);
-        setLastActuationValue(on);
-        if (isCoordinatedAfterActuate()) {
-            coordinateWithMachine(true);
-        }
     }
 
     @Override
     public void actuate(double value) throws Exception {
-        if (isCoordinatedBeforeActuate()) {
-            coordinateWithMachine(false);
-        }
-        Logger.debug("{}.actuate({})", getName(), value);
         Map<String, Object> globals = new HashMap<>();
         globals.put("actuateDouble", value);
         this.execute(globals);
-        setLastActuationValue(value);
-        if (isCoordinatedAfterActuate()) {
-            coordinateWithMachine(true);
-        }
     }
 
     @Override
     public Wizard getConfigurationWizard() {
-        return new ScriptActuatorConfigurationWizard(getMachine(), this);
+        return new ScriptActuatorConfigurationWizard(this);
     }
 
     public String getScriptName() {

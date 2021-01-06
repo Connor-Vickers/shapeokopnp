@@ -263,14 +263,13 @@ public class MachineControlsPanel extends JPanel {
                 Machine machine = Configuration.get().getMachine();
                 boolean enable = !machine.isEnabled();
                 try {
-                    Configuration.get().getMachine().setEnabled(enable);
-                    // TODO STOPSHIP move setEnabled into a binding.
-                    setEnabled(true);
-                    if (machine.getHomeAfterEnabled() && machine.isEnabled()) {
-                        UiUtils.submitUiMachineTask(() -> {
-                            machine.home();
-                        });
-                    }
+					Configuration.get().getMachine().setEnabled(enable);
+					// TODO STOPSHIP move setEnabled into a binding.
+					setEnabled(true);
+					if (machine.getHomeAfterEnabled() && machine.isEnabled()) {
+                        // TODO STOPSHIP should not be in the UI
+						machine.home();
+					}
                 }
                 catch (Exception t1) {
                     MessageBoxes.errorBox(MachineControlsPanel.this, "Enable Failure", //$NON-NLS-1$

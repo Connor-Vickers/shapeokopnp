@@ -66,10 +66,8 @@ public class ContactProbeNozzleWizard extends AbstractConfigurationWizard {
         panel = new JPanel();
         contentPanel.add(panel);
         panel.setLayout(new FormLayout(new ColumnSpec[] {
-                FormSpecs.RELATED_GAP_COLSPEC,
                 FormSpecs.DEFAULT_COLSPEC,
-                FormSpecs.RELATED_GAP_COLSPEC,
-                FormSpecs.DEFAULT_COLSPEC,},
+                ColumnSpec.decode("default:grow"),},
             new RowSpec[] {
                 FormSpecs.RELATED_GAP_ROWSPEC,
                 RowSpec.decode("26px"),
@@ -77,12 +75,11 @@ public class ContactProbeNozzleWizard extends AbstractConfigurationWizard {
                 FormSpecs.DEFAULT_ROWSPEC,}));
         
         lblContactProbeActuator = new JLabel("Contact Probe Actuator");
-        panel.add(lblContactProbeActuator, "2, 2, left, center");
+        panel.add(lblContactProbeActuator, "1, 2, left, center");
         
         comboBoxContactProbeActuator = new JComboBox();
-        comboBoxContactProbeActuator.setMaximumRowCount(15);
         comboBoxContactProbeActuator.setModel(new ActuatorsComboBoxModel(nozzle.getHead()));
-        panel.add(comboBoxContactProbeActuator, "4, 2, default, top");
+        panel.add(comboBoxContactProbeActuator, "2, 2, default, top");
     }
 
     @Override

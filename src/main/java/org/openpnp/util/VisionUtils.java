@@ -180,9 +180,8 @@ public class VisionUtils {
      * want to remove it in case people are using it, but it does the same thing. 
      * @param camera
      * @return
-     * @throws Exception 
      */
-    public static String readQrCode(Camera camera) throws Exception {
+    public static String readQrCode(Camera camera) {
         return scanBarcode(camera);
     }
     
@@ -190,9 +189,8 @@ public class VisionUtils {
      * Using the given camera, try to find any supported barcode and return it's text. 
      * @param camera
      * @return
-     * @throws Exception 
      */
-    public static String scanBarcode(Camera camera) throws Exception {
+    public static String scanBarcode(Camera camera) {
         BufferedImage image = camera.settleAndCapture();
         BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(
                 new BufferedImageLuminanceSource(image)));

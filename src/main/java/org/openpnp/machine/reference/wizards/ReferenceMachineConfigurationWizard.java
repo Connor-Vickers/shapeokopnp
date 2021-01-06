@@ -1,8 +1,5 @@
 package org.openpnp.machine.reference.wizards;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -12,7 +9,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
-import org.openpnp.gui.MainFrame;
 import org.openpnp.gui.components.ComponentDecorators;
 import org.openpnp.gui.components.LocationButtonsPanel;
 import org.openpnp.gui.support.AbstractConfigurationWizard;
@@ -21,11 +17,11 @@ import org.openpnp.gui.support.LengthConverter;
 import org.openpnp.gui.support.MessageBoxes;
 import org.openpnp.gui.support.MutableLocationProxy;
 import org.openpnp.machine.neoden4.NeoDen4Driver;
+import org.openpnp.machine.reference.ReferenceDriver;
 import org.openpnp.machine.reference.ReferenceMachine;
 import org.openpnp.machine.reference.driver.GcodeDriver;
 import org.openpnp.machine.reference.driver.NullDriver;
 import org.openpnp.model.Configuration;
-import org.openpnp.spi.MotionPlanner;
 
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -34,20 +30,19 @@ import com.jgoodies.forms.layout.RowSpec;
 
 public class ReferenceMachineConfigurationWizard extends AbstractConfigurationWizard {
 
-    private final ReferenceMachine machine;
+	private final ReferenceMachine machine;
+    private JComboBox comboBoxDriver;
     private JCheckBox checkBoxHomeAfterEnabled;
-    private String motionPlannerClassName;
+    private String driverClassName;
     private JTextField discardXTf;
     private JTextField discardYTf;
     private JTextField discardZTf;
     private JTextField discardCTf;
-    private JComboBox motionPlannerClass;
-    private boolean reloadWizard;
 
     public ReferenceMachineConfigurationWizard(ReferenceMachine machine) {
         this.machine = machine;
 
-        JPanel panelGeneral = new JPanel();
+                JPanel panelGeneral = new JPanel();
         contentPanel.add(panelGeneral);
         panelGeneral.setBorder(new TitledBorder(null, "General", TitledBorder.LEADING,
                 TitledBorder.TOP, null, null));
@@ -63,20 +58,18 @@ public class ReferenceMachineConfigurationWizard extends AbstractConfigurationWi
                 FormSpecs.DEFAULT_ROWSPEC,
                 FormSpecs.RELATED_GAP_ROWSPEC,
                 FormSpecs.DEFAULT_ROWSPEC,}));
+        JLabel lblDriver = new JLabel("Driver");
+        panelGeneral.add(lblDriver, "2, 2");
         
-        JLabel lblHomeAfterEnabled = new JLabel("Home after enabled?");
-        panelGeneral.add(lblHomeAfterEnabled, "2, 2, right, default");
+                comboBoxDriver = new JComboBox();
+        panelGeneral.add(comboBoxDriver, "2, 4");
         
-        checkBoxHomeAfterEnabled = new JCheckBox("");
-        panelGeneral.add(checkBoxHomeAfterEnabled, "4, 2");
+        checkBoxHomeAfterEnabled = new JCheckBox("Home after enabled?");
+        panelGeneral.add(checkBoxHomeAfterEnabled, "2, 6");
         
-        JLabel lblMotionPlanning = new JLabel("Motion Planning");
-        panelGeneral.add(lblMotionPlanning, "2, 4, right, default");
-        
-        Object[] classNames = machine.getCompatibleMotionPlannerClasses().stream()
-        .map(c -> c.getSimpleName()).toArray();
-        motionPlannerClass = new JComboBox(classNames);
-        panelGeneral.add(motionPlannerClass, "4, 4, fill, default");
+                comboBoxDriver.addItem(NullDriver.class.getCanonicalName());
+        comboBoxDriver.addItem(GcodeDriver.class.getCanonicalName());
+        comboBoxDriver.addItem(NeoDen4Driver.class.getCanonicalName());
         
                 JPanel panelLocations = new JPanel();
         panelLocations.setBorder(new TitledBorder(null, "Locations", TitledBorder.LEADING,
@@ -130,6 +123,8 @@ public class ReferenceMachineConfigurationWizard extends AbstractConfigurationWi
                 LocationButtonsPanel locationButtonsPanel =
                         new LocationButtonsPanel(discardXTf, discardYTf, discardZTf, discardCTf);
         panelLocations.add(locationButtonsPanel, "12, 4");
+
+        this.driverClassName = machine.getDriver().getClass().getCanonicalName();
     }
 
     @Override
@@ -138,10 +133,8 @@ public class ReferenceMachineConfigurationWizard extends AbstractConfigurationWi
                 new DoubleConverter(Configuration.get().getLengthDisplayFormat());
         LengthConverter lengthConverter = new LengthConverter();
 
+        addWrappedBinding(this, "driverClassName", comboBoxDriver, "selectedItem");
         addWrappedBinding(machine, "homeAfterEnabled", checkBoxHomeAfterEnabled, "selected");
-        
-        motionPlannerClassName = machine.getMotionPlanner().getClass().getSimpleName();
-        addWrappedBinding(this, "motionPlannerClassName", motionPlannerClass, "selectedItem");
 
         MutableLocationProxy discardLocation = new MutableLocationProxy();
         bind(UpdateStrategy.READ_WRITE, machine, "discardLocation", discardLocation, "location");
@@ -156,31 +149,19 @@ public class ReferenceMachineConfigurationWizard extends AbstractConfigurationWi
         ComponentDecorators.decorateWithAutoSelectAndLengthConversion(discardCTf);
     }
 
-    public String getMotionPlannerClassName() {
-        return motionPlannerClassName;
+    public String getDriverClassName() {
+        return driverClassName;
     }
 
-    public void setMotionPlannerClassName(String motionPlannerClassName) throws Exception {
-        if (machine.getMotionPlanner().getClass().getSimpleName().equals(motionPlannerClassName)) {
+    public void setDriverClassName(String driverClassName) throws Exception {
+        if (machine.getDriver().getClass().getCanonicalName().equals(driverClassName)) {
             return;
         }
-        for (Class<? extends MotionPlanner> motionPlannerClass : machine.getCompatibleMotionPlannerClasses()) {
-            if (motionPlannerClass.getSimpleName().equals(motionPlannerClassName)) {
-                MotionPlanner motionPlanner = (MotionPlanner) motionPlannerClass.newInstance();
-                machine.setMotionPlanner(motionPlanner);
-                this.motionPlannerClassName = motionPlannerClassName;
-                reloadWizard = true;
-                break;
-            }
-        }
-    }
-
-    @Override
-    protected void saveToModel() {
-        super.saveToModel();
-        if (reloadWizard) {
-            // Reselect the tree path to reload the wizard with potentially different property sheets. 
-            MainFrame.get().getMachineSetupTab().selectCurrentTreePath();
-        }
+        ReferenceDriver driver = (ReferenceDriver) Class.forName(driverClassName).newInstance();
+        driver.createDefaults();
+        machine.setDriver(driver);
+        this.driverClassName = driverClassName;
+        MessageBoxes.infoBox("Restart Required",
+                "Please restart OpenPnP for the changes to take effect.");
     }
 }
